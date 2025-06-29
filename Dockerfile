@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y wget unzip cron && rm -rf /var/lib/apt/
 COPY docker/import-wca-db.sh /docker/import-wca-db.sh
 COPY docker/cronjob /etc/cron.d/import-wca-db
 
+# Copy entrypoint wrapper script
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Make script executable
 RUN chmod +x /docker/import-wca-db.sh
 
@@ -26,5 +30,6 @@ EXPOSE 3306
 # Declare the data directory as a volume for persistence
 VOLUME /var/lib/mysql
 
-# Start MariaDB and cron
-CMD ["sh", "-c", "service cron start && docker-entrypoint.sh mysqld"]
+# Use custom entrypoint to start cron and delegate to MariaDB entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["mariadbd"]
