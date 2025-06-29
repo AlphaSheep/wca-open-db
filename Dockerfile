@@ -1,5 +1,6 @@
 # Start from the official MariaDB image
 FROM mariadb:latest
+LABEL org.opencontainers.image.source="https://github.com/AlphaSheep/wca-open-db"
 
 # Install required tools
 RUN apt-get update && apt-get install -y wget unzip cron && rm -rf /var/lib/apt/lists/*
