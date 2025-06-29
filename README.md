@@ -83,6 +83,6 @@ docker tag wca-open-db:latest <your-repo>/wca-open-db:latest
 docker push <your-repo>/wca-open-db:latest
 ```
 
----
+## License
 
-
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
