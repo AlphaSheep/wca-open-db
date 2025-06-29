@@ -23,5 +23,8 @@ RUN touch /var/log/cron.log
 # Expose MariaDB port
 EXPOSE 3306
 
+# Declare the data directory as a volume for persistence
+VOLUME /var/lib/mysql
+
 # Start MariaDB and cron
 CMD ["sh", "-c", "service cron start && docker-entrypoint.sh mysqld"]
