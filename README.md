@@ -18,6 +18,8 @@ This project is not affiliated with the WCA in any way.
     ```
     MYSQL_ROOT_PASSWORD=yourpassword
     MYSQL_DATABASE=wca
+    # Optional: Set to true to import the latest WCA DB on container startup
+    # IMPORT_WCA_DB_ON_STARTUP=true
     ```
 
 2. **Build the image:**
@@ -29,6 +31,7 @@ This project is not affiliated with the WCA in any way.
     docker run -d \
       --name wca-open-db \
       --env-file .env \
+      -e IMPORT_WCA_DB_ON_STARTUP=true \
       -p 3306:3306 \
       -v wca-open-db-data:/var/lib/mysql \
       wca-open-db:latest
@@ -46,6 +49,8 @@ services:
     image: wca-open-db:latest
     container_name: wca-open-db
     env_file: .env
+    environment:
+      - IMPORT_WCA_DB_ON_STARTUP=false  # Optional: import latest WCA DB on startup
     ports:
       - "127.0.0.1:3306:3306"
     volumes:
@@ -55,13 +60,15 @@ volumes:
   wca-open-db-data:
 ```
 
-This will ensure your database data is persisted and the container is easy to manage and restart.
+This will ensure your database data is persisted and the container is easy to manage and restart. Set `IMPORT_WCA_DB_ON_STARTUP=true` to automatically import the latest WCA database on container startup.
+
 
 
 ## Environment Variables
 
 - `MYSQL_ROOT_PASSWORD`: MariaDB root password
 - `MYSQL_DATABASE`: Database to import WCA data into
+- `IMPORT_WCA_DB_ON_STARTUP`: (optional) If set to `true`, downloads and imports the latest WCA database export on container startup.
 
 
 ## Data Persistence
@@ -74,6 +81,17 @@ The MariaDB data directory (`/var/lib/mysql`) is declared as a volume in the Doc
 - The database is updated daily at 01:00 UTC by default using the WCA public export.
 - You can change the schedule by editing `docker/cronjob`.
 - Logs are available in `/var/log/cron.log` inside the container.
+
+
+## Manual Update
+
+To manually download and import the latest WCA database export at any time, run the following command:
+
+```bash
+docker exec -it wca-open-db /docker/import-wca-db.sh
+```
+
+This will execute the import script inside the running container, using the environment variables you provided.
 
 
 ## Publishing
