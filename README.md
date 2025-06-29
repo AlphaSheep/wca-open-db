@@ -14,6 +14,55 @@ This project is not affiliated with the WCA in any way.
 
 
 ## Usage
+
+To run the latest published image:
+
+1. **Create a `.env` file** with the following contents (replace values as needed):
+    ```
+    MYSQL_ROOT_PASSWORD=yourpassword
+    MYSQL_DATABASE=wca
+    ```
+
+2. **Run the container from GHCR:**
+    ```bash
+    docker run -d \
+      --name wca-open-db \
+      --env-file .env \
+      -e IMPORT_WCA_DB_ON_STARTUP=true \
+      -p 127.0.0.1:3306:3306 \
+      -v wca-open-db-data:/var/lib/mysql \
+      ghcr.io/alphasheep/wca-open-db:latest
+    ```
+    This will pull the image from GHCR and create (or reuse) a Docker-managed volume named `wca-open-db-data` to persist your database data across restarts and upgrades.
+
+
+### Docker Compose
+
+You can also use Docker Compose to manage the database container and persistent storage:
+
+```yaml
+services:
+  wca-open-db:
+    image: ghcr.io/alphasheep/wca-open-db:latest
+    container_name: wca-open-db
+    env_file: .env
+    environment:
+      - IMPORT_WCA_DB_ON_STARTUP=false  # Optional: import latest WCA DB on startup
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - wca-open-db-data:/var/lib/mysql
+
+volumes:
+  wca-open-db-data:
+```
+
+This will ensure your database data is persisted and the container is easy to manage and restart. Set `IMPORT_WCA_DB_ON_STARTUP=true` to automatically import the latest WCA database on container startup.
+
+
+## Build Locally
+If you want to build the image yourself:
+
 1. **Create a `.env` file** with the following contents (replace values as needed):
     ```
     MYSQL_ROOT_PASSWORD=yourpassword
@@ -32,36 +81,11 @@ This project is not affiliated with the WCA in any way.
       --name wca-open-db \
       --env-file .env \
       -e IMPORT_WCA_DB_ON_STARTUP=true \
-      -p 3306:3306 \
+      -p 127.0.0.1:3306:3306 \
       -v wca-open-db-data:/var/lib/mysql \
       wca-open-db:latest
     ```
     This will create (or reuse) a Docker-managed volume named `wca-open-db-data` to persist your database data across restarts and upgrades.
-
-
-## Sample Docker Compose
-
-You can also use Docker Compose to manage the database container and persistent storage:
-
-```yaml
-services:
-  wca-open-db:
-    image: wca-open-db:latest
-    container_name: wca-open-db
-    env_file: .env
-    environment:
-      - IMPORT_WCA_DB_ON_STARTUP=false  # Optional: import latest WCA DB on startup
-    ports:
-      - "127.0.0.1:3306:3306"
-    volumes:
-      - wca-open-db-data:/var/lib/mysql
-
-volumes:
-  wca-open-db-data:
-```
-
-This will ensure your database data is persisted and the container is easy to manage and restart. Set `IMPORT_WCA_DB_ON_STARTUP=true` to automatically import the latest WCA database on container startup.
-
 
 
 ## Environment Variables
