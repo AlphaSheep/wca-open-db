@@ -1,12 +1,29 @@
 #!/bin/bash
 set -e
+
 TMP_DIR=$(mktemp -d "/tmp/wca_db_$(date +%Y%m%d_%H%M%S)_XXXXXX")
 
-WCA_EXPORT_URL="https://www.worldcubeassociation.org/export/results/WCA_export.sql"
+WCA_PUBLIC_EXPORT_URL="https://www.worldcubeassociation.org/export/results/WCA_export.sql"
+WCA_DEVELOPER_EXPORT_URL="https://assets.worldcubeassociation.org/export/developer/wca-developer-database-dump.zip"
+
+if [ "${USE_WCA_DEVELOPER_EXPORT}" = "true" ]; then
+    echo "Using WCA developer export."
+    WCA_EXPORT_URL="$WCA_DEVELOPER_EXPORT_URL"
+    RESULTS_FILE="wca-developer-database-dump.sql"
+else
+    echo "Using WCA public export."
+    WCA_EXPORT_URL="$WCA_PUBLIC_EXPORT_URL"
+    RESULTS_FILE="WCA_export.sql"
+fi
 
 wget -O "$TMP_DIR/WCA_export.sql.zip" "$WCA_EXPORT_URL"
 unzip -o "$TMP_DIR/WCA_export.sql.zip" -d "$TMP_DIR"
 
-mariadb -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$TMP_DIR/WCA_export.sql"
+echo "Importing WCA database from $RESULTS_FILE into $MARIADB_DATABASE"
+if [ "${USE_WCA_DEVELOPER_EXPORT}" = "true" ]; then
+    echo "Note: The developer export may take an hour or more to import."
+fi
+
+mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE" < "$TMP_DIR/$RESULTS_FILE"
 
 rm -rf "$TMP_DIR"

@@ -19,8 +19,8 @@ To run the latest published image:
 
 1. **Create a `.env` file** with the following contents (replace values as needed):
     ```
-    MYSQL_ROOT_PASSWORD=yourpassword
-    MYSQL_DATABASE=wca
+    MARIADB_ROOT_PASSWORD=yourpassword
+    MARIADB_DATABASE=wca
     ```
 
 2. **Run the container from GHCR:**
@@ -59,16 +59,36 @@ volumes:
 
 This will ensure your database data is persisted and the container is easy to manage and restart. Set `IMPORT_WCA_DB_ON_STARTUP=true` to automatically import the latest WCA database on container startup.
 
+### Environment Variables:
+
+The following environment variables can be set in the container to configure behaviour:
+
+WCA Database variables:
+
+- `IMPORT_WCA_DB_ON_STARTUP`: _(optional)_ If set to `true`, downloads and imports the latest WCA database export on container startup. By default, the database is not automatically imported on startup.
+- `USE_WCA_DEVELOPER_EXPORT`: _(optional)_ If set to `true`, uses the WCA developer export instead of the public export. By default, the public export is used.
+    - *Public export*: updates daily and imports in under a minute. Contains only person, competition, rankings, and results data.
+    - *Developer export*: updates every 3 days, and takes about an hour to import. Contains much more detailed information, including WCIF data, schedules, registration information, and more.
+
+
+MariaDB variables:
+
+- `MARIADB_ROOT_PASSWORD`: MariaDB root password. You can connect to the database using the username `root` and this password. You could also set `MARIADB_RANDOM_ROOT_PASSWORD=1` to generate a random root password which will be written to the container logs.
+- `MARIADB_USER`: _(optional)_ Username for a non-root user to access the database. By default, only the root user is created.
+- `MARIADB_PASSWORD`: _(optional)_ Password for the non-root user specified by `MARIADB_USER`.
+
 
 ## Build Locally
 If you want to build the image yourself:
 
 1. **Create a `.env` file** with the following contents (replace values as needed):
     ```
-    MYSQL_ROOT_PASSWORD=yourpassword
-    MYSQL_DATABASE=wca
+    MARIADB_ROOT_PASSWORD=yourpassword
+    MARIADB_DATABASE=wca
     # Optional: Set to true to import the latest WCA DB on container startup
     # IMPORT_WCA_DB_ON_STARTUP=true
+    # Optional: Set to true to use the WCA developer export instead of the public export
+    # USE_WCA_DEVELOPER_EXPORT=true
     ```
 
 2. **Build the image:**
@@ -86,13 +106,6 @@ If you want to build the image yourself:
       wca-open-db:latest
     ```
     This will create (or reuse) a Docker-managed volume named `wca-open-db-data` to persist your database data across restarts and upgrades.
-
-
-## Environment Variables
-
-- `MYSQL_ROOT_PASSWORD`: MariaDB root password
-- `MYSQL_DATABASE`: Database to import WCA data into
-- `IMPORT_WCA_DB_ON_STARTUP`: (optional) If set to `true`, downloads and imports the latest WCA database export on container startup.
 
 
 ## Data Persistence
