@@ -45,6 +45,7 @@ services:
   wca-open-db:
     image: ghcr.io/alphasheep/wca-open-db:latest
     container_name: wca-open-db
+    restart: unless-stopped
     env_file: .env
     environment:
       - IMPORT_WCA_DB_ON_STARTUP=false  # Optional: import latest WCA DB on startup
@@ -52,6 +53,7 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - wca-open-db-data:/var/lib/mysql
+      - ./wca-metadata:/wca  # Optional: mount folder to access metadata.json if using the public export
 
 volumes:
   wca-open-db-data:

@@ -30,6 +30,7 @@ EXPOSE 3306
 
 # Declare the data directory as a volume for persistence
 VOLUME /var/lib/mysql
+VOLUME /wca-metadata
 
 # Use custom entrypoint to start cron and delegate to MariaDB entrypoint
 ENTRYPOINT ["/entrypoint.sh"]

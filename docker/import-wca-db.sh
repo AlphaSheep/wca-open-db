@@ -26,4 +26,14 @@ fi
 
 mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE" < "$TMP_DIR/$RESULTS_FILE"
 
+if [ "${USE_WCA_DEVELOPER_EXPORT}" = "true" ]; then
+    echo "Done loading developer export"
+else
+    # Copy out metadata.json
+    mkdir -p "/wca-metadata"
+    mv "$TMP_DIR/metadata.json" "/wca-metadata/metadata.json"
+    echo "Done loading public export"
+    echo "Metadata file copied to /wca-metadata/metadata.json"
+fi
+
 rm -rf "$TMP_DIR"
