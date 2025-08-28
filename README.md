@@ -115,7 +115,7 @@ The MariaDB data directory (`/var/lib/mysql`) is declared as a volume in the Doc
 
 ## Automatic Updates
 
-- The database is updated daily at 01:00 UTC by default using the WCA public export.
+- The database is updated daily at 01:00 UTC using the latest WCA export.
 - You can change the schedule by editing `docker/cronjob`.
 - Logs are available in `/var/log/cron.log` inside the container.
 
