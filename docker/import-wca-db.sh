@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "Cleaning up old temporary files..."
+find /tmp -maxdepth 1 -type d -name "wca_db_*" -exec rm -rf {} +
+
 TMP_DIR=$(mktemp -d "/tmp/wca_db_$(date +%Y%m%d_%H%M%S)_XXXXXX")
+trap 'rc=$?; rm -rf "$TMP_DIR" >/dev/null 2>&1 || true; exit $rc' EXIT
 
 WCA_PUBLIC_EXPORT_URL="https://www.worldcubeassociation.org/export/results/WCA_export.sql"
 WCA_DEVELOPER_EXPORT_URL="https://assets.worldcubeassociation.org/export/developer/wca-developer-database-dump.zip"
