@@ -1,3 +1,3 @@
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-0 1 * * * root /docker/import-wca-db.sh >> /var/log/cron.log 2>&1
+0 1 * * * root . /etc/cron.env; /docker/import-wca-db.sh >> /var/log/cron.log 2>&1

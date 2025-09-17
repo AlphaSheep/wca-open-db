@@ -6,8 +6,25 @@ set -e
 echo "Using database: $MARIADB_DATABASE"
 
 
+# Write Docker's runtime env into a shell-parseable file.
+# - Escapes backslashes and double quotes
+# - Skips variables with newlines (cron env files can’t handle those)
+printenv | awk -F= '
+  BEGIN { OFS="=" }
+  $1 != "" {
+    key=$1
+    # reconstruct value (handles values containing "=")
+    val = substr($0, index($0, "=") + 1)
+    if (val ~ /\n/ || val ~ /\r/) next
+    gsub(/\\/,"\\\\",val)
+    gsub(/"/,"\\\"",val)
+    printf("export %s=\"%s\"\n", key, val)
+  }
+' >/etc/cron.env
+
 # Start cron in the background
 service cron start
+
 
 # Delegate to the official MariaDB entrypoint, passing all arguments
 /usr/local/bin/docker-entrypoint.sh "$@"  &
