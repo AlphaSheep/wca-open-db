@@ -1,0 +1,13 @@
+mode: Mainline
+branches:
+  main:
+    tag: ''
+    increment: Minor
+    is-mainline: true
+  feature:
+    tag: 'alpha.{BranchName}'
+    increment: Minor
+    is-mainline: false
+ignore:
+  sha: []
+merge-message-formats: {}
