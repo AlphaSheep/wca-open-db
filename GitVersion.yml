@@ -5,7 +5,7 @@ branches:
     increment: Minor
     is-mainline: true
   feature:
-    tag: 'alpha.{BranchName}'
+    tag: 'alpha'
     increment: Minor
     is-mainline: false
 ignore:
