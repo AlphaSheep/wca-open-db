@@ -49,8 +49,8 @@ jobs:
             type=ref,event=branch      # tags your branch name (e.g. main)
             type=ref,event=tag         # tags your tag name (e.g. v1.0.0)
             type=raw,value=latest      # always add “latest”
-            type=raw,value=${{ steps.gitversion.outputs.semVer }}
-            type=raw,value=${{ steps.gitversion.outputs.major }}
+            type=raw,value=${{ steps.gitversion.outputs.semVer }}    # semantic version (e.g. 1.2.3)
+            type=raw,value=${{ steps.gitversion.outputs.major }}     # major version (e.g. 1)
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
