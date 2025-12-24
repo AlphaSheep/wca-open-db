@@ -7,7 +7,7 @@ find /tmp -maxdepth 1 -type d -name "wca_db_*" -exec rm -rf {} +
 TMP_DIR=$(mktemp -d "/tmp/wca_db_$(date +%Y%m%d_%H%M%S)_XXXXXX")
 trap 'rc=$?; [ -n "$TMP_DIR" ] && rm -rf "$TMP_DIR" >/dev/null 2>&1 || true; exit $rc' EXIT
 
-WCA_PUBLIC_EXPORT_URL="https://www.worldcubeassociation.org/export/results/WCA_export.sql"
+WCA_PUBLIC_EXPORT_URL="https://www.worldcubeassociation.org/export/results/v2/sql"
 WCA_DEVELOPER_EXPORT_URL="https://assets.worldcubeassociation.org/export/developer/wca-developer-database-dump.zip"
 
 if [ "${USE_WCA_DEVELOPER_EXPORT}" = "true" ]; then

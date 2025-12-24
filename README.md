@@ -1,9 +1,11 @@
 # WCA Open DB
 
-An unofficial hands-off database server with the latest World Cube Association (WCA) public database export, updated daily.
+An unofficial, self-updating, hands-off database server with the latest World Cube Association (WCA) database export, updated daily.
 
 This project is not affiliated with the WCA in any way.
 
+> [!WARNING]
+> The `latest` tag of wca-open-db now uses version 2 of the WCA results export. If you need to continue using version 1, please pin to the tag `1`. For example, `ghcr.io/alphasheep/wca-open-db:1`. note that version 1 of the Results Export has been deprecated and support for it will be discontinued from 2026-01-15. See the [WCA Results Export page](https://www.worldcubeassociation.org/export/results) for details about the changes.
 
 ## Features
 
