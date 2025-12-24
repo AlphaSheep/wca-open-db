@@ -2,7 +2,7 @@ mode: Mainline
 branches:
   main:
     tag: ''
-    increment: Minor
+    increment: Patch
     is-mainline: true
   feature:
     tag: 'alpha'
