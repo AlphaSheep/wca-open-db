@@ -5,7 +5,7 @@ An unofficial, self-updating, hands-off database server with the latest World Cu
 This project is not affiliated with the WCA in any way.
 
 > [!WARNING]
-> The `latest` tag of wca-open-db now uses version 2 of the WCA results export. If you need to continue using version 1, please pin to the tag `1`. For example, `ghcr.io/alphasheep/wca-open-db:1`. note that version 1 of the Results Export has been deprecated and support for it will be discontinued from 2026-01-15. See the [WCA Results Export page](https://www.worldcubeassociation.org/export/results) for details about the changes.
+> The `latest` tag of wca-open-db now uses version 2 of the WCA results export. If you need to continue using version 1, please pin to the tag `1`. For example, `ghcr.io/alphasheep/wca-open-db:1`. note that version 1 of the Results Export has been deprecated and support for it will no longer update with new results after 2026-01-15. See the [WCA Results Export page](https://www.worldcubeassociation.org/export/results) for details about the changes.
 
 ## Features
 
@@ -55,7 +55,7 @@ services:
       - "127.0.0.1:3306:3306"
     volumes:
       - wca-open-db-data:/var/lib/mysql
-      - ./wca-metadata:/wca  # Optional: mount folder to access metadata.json if using the public export
+      - ./wca-metadata:/wca-metadata  # Optional: mount folder to access metadata.json if using the public export
 
 volumes:
   wca-open-db-data:
@@ -67,19 +67,26 @@ This will ensure your database data is persisted and the container is easy to ma
 
 The following environment variables can be set in the container to configure behaviour:
 
-WCA Database variables:
+**WCA Database variables:**
 
 - `IMPORT_WCA_DB_ON_STARTUP`: _(optional)_ If set to `true`, downloads and imports the latest WCA database export on container startup. By default, the database is not automatically imported on startup.
 - `USE_WCA_DEVELOPER_EXPORT`: _(optional)_ If set to `true`, uses the WCA developer export instead of the public export. By default, the public export is used.
-    - *Public export*: updates daily and imports in under a minute. Contains only person, competition, rankings, and results data.
+    - *Public export*: updates daily and imports in under a minute. Contains only person, competition, rankings, results, and attempts data.
     - *Developer export*: updates every 3 days, and takes about an hour to import. Contains much more detailed information, including WCIF data, schedules, registration information, and more.
+- `BUILD_ATTEMPTS_INDEX`: _(optional)_ If set to `true` with the public export, adds an index to the `attempts` table to speed up queries that involve joining attempts with results. This adds an extra 5-10 minutes to the import, but if you are going to be doing anything with the `attempts` table. If you are only using the rankings tables or results without the individual attempts, then you don't need this index.
 
 
-MariaDB variables:
+**MariaDB variables:**
 
 - `MARIADB_ROOT_PASSWORD`: MariaDB root password. You can connect to the database using the username `root` and this password. You could also set `MARIADB_RANDOM_ROOT_PASSWORD=1` to generate a random root password which will be written to the container logs.
 - `MARIADB_USER`: _(optional)_ Username for a non-root user to access the database. By default, only the root user is created.
 - `MARIADB_PASSWORD`: _(optional)_ Password for the non-root user specified by `MARIADB_USER`.
+
+**Debug variables:**
+_(you shouldn't need to change these unless you're doing something special)_
+
+- `WCA_PUBLIC_EXPORT_URL`: Override the public export endpoint
+- `WCA_DEVELOPER_EXPORT_URL`: Override the developer export endpoint
 
 
 ## Build Locally
