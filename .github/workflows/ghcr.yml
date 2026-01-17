@@ -2,7 +2,7 @@ name: Build and Push to GHCR
 
 on:
   workflow_run:
-    workflows: ["tests"]
+    workflows: ["Run Tests"]
     types:
       - completed
     branches:
