@@ -119,6 +119,24 @@ If you want to build the image yourself:
     This will create (or reuse) a Docker-managed volume named `wca-open-db-data` to persist your database data across restarts and upgrades.
 
 
+## Testing
+
+To run the automated tests locally:
+
+1. **Build the test image:**
+    ```bash
+    docker build -t wca-open-db:test .
+    ```
+2. **Run all tests:**
+    ```bash
+    tests/run-all.sh
+    ```
+3. **Cleanup:**
+    ```bash
+    docker rmi wca-open-db:test
+    ```
+
+
 ## Data Persistence
 
 The MariaDB data directory (`/var/lib/mysql`) is declared as a volume in the Dockerfile. You should mount a volume to this path to persist the data when the container stops or is removed.

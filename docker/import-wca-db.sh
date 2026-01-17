@@ -14,13 +14,14 @@ LOCK_FD=9
 
 # Cleanup temporary directory and lock on exit
 trap 'rc=$?; [ -n "$TMP_DIR" ] && rm -rf "$TMP_DIR" >/dev/null 2>&1 || true; \
-      if [ -n "$LOCK_FD" ]; then flock -u "$LOCK_FD" >/dev/null 2>&1 || true; fi; \
-      [ -n "$LOCK_FILE" ] && rm -f "$LOCK_FILE" >/dev/null 2>&1 || true; \
+    flock -u 9 >/dev/null 2>&1 || true; \
+    [ -n "$LOCK_FILE" ] && rm -f "$LOCK_FILE" >/dev/null 2>&1 || true; \
       exit $rc' EXIT
 
 # Acquire non-blocking lock to prevent concurrent imports
-exec $LOCK_FD>"$LOCK_FILE"
-if ! flock -n "$LOCK_FD"; then
+mkdir -p "$(dirname "$LOCK_FILE")"
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
     echo "Another import is already running; exiting."
     exit 0
 fi

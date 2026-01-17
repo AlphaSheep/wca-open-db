@@ -12,62 +12,8 @@ jobs:
       - name: Build image
         run: docker build -t wca-open-db:ci .
 
-      - name: Prepare tiny sample export
-        run: |
-          cat > /tmp/WCA_export.sql <<'SQL'
-          CREATE TABLE test_table (id INT PRIMARY KEY, name VARCHAR(50));
-          INSERT INTO test_table VALUES (1, 'ok');
+      - name: Make test scripts executable
+        run: chmod +x tests/*.sh
 
-          CREATE TABLE results (
-            id BIGINT PRIMARY KEY AUTO_INCREMENT,
-            event_id VARCHAR(6) NOT NULL
-          );
-
-          CREATE TABLE result_attempts (
-            id BIGINT PRIMARY KEY AUTO_INCREMENT,
-            result_id BIGINT NOT NULL
-          );
-          SQL
-          echo '{}' > /tmp/metadata.json
-          (cd /tmp && zip -q WCA_export.sql.zip WCA_export.sql metadata.json)
-
-      - name: Run smoke import
-        run: |
-          docker run --rm \
-            -e MARIADB_ROOT_PASSWORD=pass \
-            -e MARIADB_DATABASE=wca \
-            -e WCA_PUBLIC_EXPORT_URL="file:///tmp/WCA_export.sql.zip" \
-            -v /tmp/WCA_export.sql.zip:/tmp/WCA_export.sql.zip:ro \
-            wca-open-db:ci \
-            bash -c "/docker/import-wca-db.sh && mariadb -u root -ppass -e \"SELECT name FROM test_table WHERE id=1\" wca"
-
-      - name: Run index creation and idempotency test
-        run: |
-          docker run -d --name wca-index-test \
-            -e MARIADB_ROOT_PASSWORD=pass \
-            -e MARIADB_DATABASE=wca \
-            -v /tmp/WCA_export.sql.zip:/tmp/WCA_export.sql.zip:ro \
-            wca-open-db:ci
-
-          # Wait for MariaDB to be ready
-          for i in {1..30}; do
-            if docker exec wca-index-test mariadb -u root -ppass -e "SELECT 1" >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-            if [ "$i" -eq 30 ]; then echo "MariaDB did not become ready"; exit 1; fi
-          done
-
-          # First import: indexes should be created
-          docker exec wca-index-test bash -c "WCA_PUBLIC_EXPORT_URL=file:///tmp/WCA_export.sql.zip BUILD_ATTEMPTS_INDEX=true /docker/import-wca-db.sh"
-
-          docker exec wca-index-test bash -c "test \$(mariadb -N -B -u root -ppass -e \"SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema='wca' AND table_name='results' AND index_name='idx_results_event_id';\") -ge 1"
-          docker exec wca-index-test bash -c "test \$(mariadb -N -B -u root -ppass -e \"SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema='wca' AND table_name='result_attempts' AND index_name='idx_attempts_result_id';\") -ge 1"
-
-          # Second import: indexes already exist; should not fail and remain present
-          docker exec wca-index-test bash -c "WCA_PUBLIC_EXPORT_URL=file:///tmp/WCA_export.sql.zip BUILD_ATTEMPTS_INDEX=true /docker/import-wca-db.sh"
-
-          docker exec wca-index-test bash -c "test \$(mariadb -N -B -u root -ppass -e \"SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema='wca' AND table_name='results' AND index_name='idx_results_event_id';\") -ge 1"
-          docker exec wca-index-test bash -c "test \$(mariadb -N -B -u root -ppass -e \"SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema='wca' AND table_name='result_attempts' AND index_name='idx_attempts_result_id';\") -ge 1"
-
-          docker rm -f wca-index-test
+      - name: Run all tests
+        run: tests/run-all.sh wca-open-db:ci
