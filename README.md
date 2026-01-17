@@ -73,7 +73,7 @@ The following environment variables can be set in the container to configure beh
 - `USE_WCA_DEVELOPER_EXPORT`: _(optional)_ If set to `true`, uses the WCA developer export instead of the public export. By default, the public export is used.
     - *Public export*: updates daily and imports in under a minute. Contains only person, competition, rankings, results, and attempts data.
     - *Developer export*: updates every 3 days, and takes about an hour to import. Contains much more detailed information, including WCIF data, schedules, registration information, and more.
-- `BUILD_ATTEMPTS_INDEX`: _(optional)_ If set to `true` with the public export, adds an index to the `attempts` table to speed up queries that involve joining attempts with results. This adds an extra 5-10 minutes to the import, but if you are going to be doing anything with the `attempts` table. If you are only using the rankings tables or results without the individual attempts, then you don't need this index.
+- `BUILD_ATTEMPTS_INDEX`: _(optional)_ If set to `true` with the public export, adds an index to the `attempts` table to speed up queries that involve joining attempts with results. This adds an extra 5-10 minutes to the import, but if you are going to be doing anything with the `attempts` table (selecting attempts for a specific result or joining to results), you will definitely need this index. If you are only using the rankings tables or results without the individual attempts, then you don't need this index.
 
 
 **MariaDB variables:**
